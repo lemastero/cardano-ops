@@ -67,21 +67,23 @@ in  mkShell rec {
     create-shelley-genesis-and-keys
     dnsutils
     iohkNix.niv
-    kes-rotation
     nivOverrides
     nix
     nix-diff
     nixops
     pandoc
     pstree
-    node-update
     renew-kes-keys
     telnet
     test-cronjob-script
     cardano-cli-completions
     cardano-ping
     hoursUntilNextEpoch
-  ];
+  ] ++ (lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+    # Those fail to compile under macOS:
+    kes-rotation
+    node-update
+  ]);
   # If any build input has bash completions, add it to the search
   # path for shell completions.
   XDG_DATA_DIRS = lib.concatStringsSep ":" (
@@ -95,5 +97,4 @@ in  mkShell rec {
   passthru = {
     gen-graylog-creds = iohk-ops-lib.scripts.gen-graylog-creds { staticPath = ./static; };
   };
-
 }
